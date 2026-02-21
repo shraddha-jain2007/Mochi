@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { ChevronLeft, RefreshCw, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, RefreshCw, CheckCircle2, FastForward } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useMochi } from "@/hooks/use-mochi";
+import confetti from "canvas-confetti";
 
 const FUN_TASKS = [
   "Drink a glass of water 💧",
@@ -14,11 +16,16 @@ const FUN_TASKS = [
   "Draw a tiny doodle 🎨",
   "Listen to your favorite song 🎵",
   "Take 3 deep breaths 🧘",
+  "Organize your workspace for 5 mins 🧹",
+  "Read 2 pages of a book 📖",
+  "Clean your phone screen 📱",
+  "Eat a healthy snack 🍎",
 ];
 
 export default function Tasks() {
   const [currentTask, setCurrentTask] = useState<string | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
+  const { addSession } = useMochi();
 
   const spinTask = () => {
     setIsSpinning(true);
@@ -31,15 +38,35 @@ export default function Tasks() {
     }, 800);
   };
 
+  const handleDone = () => {
+    if (!currentTask) return;
+    
+    addSession({
+      purpose: `Task: ${currentTask}`,
+      minutes: 5, // Task completions give fixed 5 XP (minutes)
+      date: new Date().toISOString(),
+      type: 'task'
+    });
+
+    confetti({
+      particleCount: 80,
+      spread: 60,
+      origin: { y: 0.6 },
+      colors: ['#A7F3D0', '#34D399', '#10B981']
+    });
+
+    setCurrentTask(null);
+  };
+
   return (
-    <div className="min-h-screen pb-24 px-4 pt-8 max-w-md mx-auto flex flex-col">
+    <div className="min-h-screen pb-24 px-4 pt-8 max-w-md mx-auto flex flex-col font-display">
       <div className="flex items-center gap-4 mb-8">
         <Link href="/dashboard">
-          <button className="p-2 rounded-full hover:bg-muted transition-colors">
+          <button className="p-3 rounded-2xl bg-card border border-border shadow-sm hover:bg-muted transition-colors btn-bounce">
             <ChevronLeft />
           </button>
         </Link>
-        <h2 className="text-2xl font-bold">I'm Bored...</h2>
+        <h2 className="text-3xl font-black">I'm Bored...</h2>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center">
@@ -47,20 +74,31 @@ export default function Tasks() {
           {currentTask ? (
             <motion.div
               key="result"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              className="bg-card w-full p-8 rounded-3xl shadow-xl border-2 border-primary/20 text-center"
+              initial={{ scale: 0.8, opacity: 0, rotate: -5 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              exit={{ scale: 0.8, opacity: 0, rotate: 5 }}
+              className="bg-card w-full p-8 rounded-[3rem] shadow-2xl artsy-border border-primary text-center space-y-8"
             >
-              <h3 className="text-2xl font-bold text-foreground mb-6 leading-relaxed">
+              <div className="text-5xl animate-bounce">✨</div>
+              <h3 className="text-3xl font-black text-foreground leading-tight">
                 {currentTask}
               </h3>
-              <button 
-                onClick={spinTask}
-                className="text-primary font-semibold hover:underline flex items-center justify-center gap-2 mx-auto"
-              >
-                <RefreshCw size={16} /> Try another
-              </button>
+              
+              <div className="space-y-3">
+                <button 
+                  onClick={handleDone}
+                  className="w-full py-4 rounded-2xl bg-secondary text-secondary-foreground font-black text-xl flex items-center justify-center gap-2 btn-bounce"
+                >
+                  <CheckCircle2 size={24} /> Done!
+                </button>
+                
+                <button 
+                  onClick={spinTask}
+                  className="w-full py-4 rounded-2xl bg-muted text-muted-foreground font-black text-lg flex items-center justify-center gap-2 btn-bounce"
+                >
+                  <FastForward size={20} /> Skip
+                </button>
+              </div>
             </motion.div>
           ) : (
             <motion.div
@@ -70,22 +108,23 @@ export default function Tasks() {
               exit={{ opacity: 0 }}
               className="text-center"
             >
-              <div className="w-40 h-40 bg-secondary/30 rounded-full flex items-center justify-center mx-auto mb-8 relative">
-                <span className="text-6xl animate-bounce">🎲</span>
+              <div className="w-48 h-48 bg-secondary/30 rounded-[3rem] flex items-center justify-center mx-auto mb-8 relative border-4 border-dashed border-secondary">
+                <span className="text-7xl animate-float">🎲</span>
                 {isSpinning && (
-                  <div className="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin" />
+                  <div className="absolute inset-0 border-8 border-primary rounded-[3rem] border-t-transparent animate-spin" />
                 )}
               </div>
-              <p className="text-muted-foreground mb-8">
-                Don't know what to do? Let Mochi pick a tiny task for you.
+              <h3 className="text-2xl font-black mb-4">Let's find something fun!</h3>
+              <p className="text-muted-foreground mb-8 font-medium">
+                Mochi has plenty of ideas for small ways to feel good today.
               </p>
               
               <button
                 onClick={spinTask}
                 disabled={isSpinning}
-                className="px-8 py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-xl shadow-lg shadow-primary/30 btn-bounce disabled:opacity-50"
+                className="w-full py-5 rounded-[2rem] bg-primary text-primary-foreground font-black text-2xl shadow-lg shadow-primary/30 btn-bounce disabled:opacity-50"
               >
-                {isSpinning ? "Picking..." : "Give me a task!"}
+                {isSpinning ? "Mochi is thinking..." : "Give me a task!"}
               </button>
             </motion.div>
           )}

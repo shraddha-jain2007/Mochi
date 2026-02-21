@@ -8,6 +8,7 @@ export interface MochiSession {
   purpose: string;
   minutes: number;
   date: string;
+  type: 'pomodoro' | 'task';
 }
 
 export interface UnlockedKitty {
@@ -34,12 +35,6 @@ const INITIAL_STATE: MochiState = {
   isDarkMode: false,
   sessions: [],
 };
-
-// --- Custom Hook for Mochi Logic ---
-// Note: We are mocking the backend interaction here using localStorage
-// because the user specifically requested "Use localStorage for persistence for ALL data".
-// The real backend hooks (useQuery/useMutation) are provided below but won't be used for the core logic 
-// to strictly follow the requirement of client-side persistence for this "lite" version.
 
 export function useMochi() {
   const [state, setState] = useState<MochiState>(INITIAL_STATE);
@@ -70,7 +65,6 @@ export function useMochi() {
 
   const addXP = (amount: number) => {
     setState(prev => {
-      // Logic for unlocking kitties based on XP milestones
       const newXP = prev.xp + amount;
       const newKitties = [...prev.unlockedKitties];
       
@@ -91,7 +85,7 @@ export function useMochi() {
   const updateStreak = () => {
     const today = new Date().toDateString();
     setState(prev => {
-      if (prev.lastSessionDate === today) return prev; // Already did a session today
+      if (prev.lastSessionDate === today) return prev;
 
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
@@ -115,8 +109,13 @@ export function useMochi() {
     }));
     
     // Update game state
-    addXP(session.minutes); // 1 min = 1 XP
-    updateStreak();
+    if (session.type === 'pomodoro') {
+      addXP(session.minutes);
+      updateStreak();
+    } else {
+      // Task completion also adds a bit of XP
+      addXP(5);
+    }
   };
 
   const clearHistory = () => {
@@ -134,32 +133,4 @@ export function useMochi() {
     toggleTheme,
     isLoaded
   };
-}
-
-// --- Standard API Hooks (if we were using the backend) ---
-export function useSessions() {
-  return useQuery({
-    queryKey: [api.sessions.list.path],
-    queryFn: async () => {
-      const res = await fetch(api.sessions.list.path);
-      if (!res.ok) throw new Error('Failed to fetch sessions');
-      return api.sessions.list.responses[200].parse(await res.json());
-    }
-  });
-}
-
-export function useCreateSession() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (data: InsertSession) => {
-      const res = await fetch(api.sessions.create.path, {
-        method: api.sessions.create.method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error('Failed to create session');
-      return api.sessions.create.responses[201].parse(await res.json());
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [api.sessions.list.path] }),
-  });
 }

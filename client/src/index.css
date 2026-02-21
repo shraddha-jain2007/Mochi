@@ -1,74 +1,73 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Fredoka:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Soft Pastel Cozy Theme */
+  /* Soft Artsy Cozy Theme */
   --font-sans: 'Nunito', sans-serif;
-  --font-display: 'Outfit', sans-serif;
+  --font-display: 'Fredoka', sans-serif;
 
-  --background: 330 30% 98%;      /* Very light pinkish white */
-  --foreground: 222 47% 11%;      /* Deep dark blue-grey */
+  --background: 35 40% 98%;      /* Warm cream white */
+  --foreground: 20 20% 20%;      /* Soft warm dark */
 
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
+  --card-foreground: 20 20% 20%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
+  --popover-foreground: 20 20% 20%;
 
-  --primary: 330 80% 70%;         /* Soft Pink */
-  --primary-foreground: 330 30% 98%;
+  --primary: 345 70% 75%;         /* Mochi Pink */
+  --primary-foreground: 345 20% 98%;
 
-  --secondary: 260 60% 92%;       /* Light Lavender */
-  --secondary-foreground: 260 40% 40%;
+  --secondary: 160 50% 90%;       /* Minty Green */
+  --secondary-foreground: 160 40% 30%;
 
-  --muted: 330 30% 96%;
-  --muted-foreground: 215 16% 47%;
+  --muted: 35 30% 95%;
+  --muted-foreground: 20 10% 45%;
 
-  --accent: 38 90% 85%;           /* Soft Peach/Orange */
-  --accent-foreground: 38 40% 40%;
+  --accent: 45 90% 80%;           /* Soft Yellow */
+  --accent-foreground: 45 40% 30%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 210 40% 98%;
 
-  --border: 330 20% 92%;
-  --input: 330 20% 92%;
-  --ring: 330 80% 70%;
+  --border: 35 20% 90%;
+  --input: 35 20% 90%;
+  --ring: 345 70% 75%;
 
-  --radius: 1.5rem; /* Very rounded corners for cozy feel */
+  --radius: 2rem; /* Extra rounded for artsy feel */
 }
 
 .dark {
-  /* Warm Charcoal Dark Mode */
-  --background: 240 10% 12%;      /* Dark charcoal */
-  --foreground: 330 30% 96%;
+  --background: 240 10% 10%;      /* Warm deep charcoal */
+  --foreground: 35 30% 95%;
 
-  --card: 240 10% 16%;
-  --card-foreground: 330 30% 96%;
+  --card: 240 10% 14%;
+  --card-foreground: 35 30% 95%;
 
-  --popover: 240 10% 16%;
-  --popover-foreground: 330 30% 96%;
+  --popover: 240 10% 14%;
+  --popover-foreground: 35 30% 95%;
 
-  --primary: 330 70% 65%;         /* Slightly muted pink for dark mode */
-  --primary-foreground: 330 30% 96%;
+  --primary: 345 60% 65%;
+  --primary-foreground: 345 20% 98%;
 
-  --secondary: 260 30% 25%;
-  --secondary-foreground: 260 60% 92%;
+  --secondary: 160 30% 20%;
+  --secondary-foreground: 160 60% 90%;
 
-  --muted: 240 10% 20%;
-  --muted-foreground: 215 20% 65%;
+  --muted: 240 10% 18%;
+  --muted-foreground: 215 20% 60%;
 
-  --accent: 38 60% 60%;
-  --accent-foreground: 38 10% 10%;
+  --accent: 45 60% 50%;
+  --accent-foreground: 240 10% 10%;
 
   --destructive: 0 62% 30%;
   --destructive-foreground: 0 85% 90%;
 
-  --border: 240 10% 25%;
-  --input: 240 10% 25%;
-  --ring: 330 70% 65%;
+  --border: 240 10% 20%;
+  --input: 240 10% 20%;
+  --ring: 345 60% 65%;
 }
 
 @layer base {
@@ -76,8 +75,10 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased transition-colors duration-300;
+    @apply bg-background text-foreground antialiased transition-colors duration-500;
     font-family: var(--font-sans);
+    background-image: radial-gradient(circle at 2px 2px, hsl(var(--muted)) 1px, transparent 0);
+    background-size: 40px 40px;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
@@ -87,14 +88,35 @@
 
 @layer components {
   .btn-bounce {
-    @apply active:scale-95 transition-transform duration-100 ease-in-out;
+    @apply active:scale-90 transition-all duration-200 ease-in-out;
   }
   
   .glass-card {
-    @apply bg-white/70 dark:bg-black/40 backdrop-blur-md border border-white/20 shadow-lg;
+    @apply bg-white/40 dark:bg-black/20 backdrop-blur-xl border border-white/30 dark:border-white/5 shadow-xl;
   }
   
-  .cozy-shadow {
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+  .artsy-border {
+    border: 3px solid currentColor;
+    box-shadow: 4px 4px 0px 0px currentColor;
   }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes cat-tail {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(15deg); }
+}
+
+.cat-tail {
+  transform-origin: bottom center;
+  animation: cat-tail 2s ease-in-out infinite;
 }
