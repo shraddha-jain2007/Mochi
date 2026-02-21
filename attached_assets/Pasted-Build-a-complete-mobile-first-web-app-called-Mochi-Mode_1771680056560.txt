@@ -1,0 +1,239 @@
+Build a complete mobile-first web app called "Mochi Mode".
+
+IMPORTANT:
+- Keep all logic clean and organized.
+- Use HTML, CSS, and JavaScript.
+- Use localStorage for persistence.
+- Do not include PWA install banners.
+- Focus on responsive mobile UI.
+- Do not break logic when styling.
+
+--------------------------------------------------
+1. HOME SCREEN
+--------------------------------------------------
+
+Use a full-screen pixel art background image (user provided).
+
+Overlay:
+- Centered app logo text: "Mochi Mode 🐾"
+- Small subtitle: "Focus gently. Grow daily."
+- A rounded button at bottom center: "Start"
+
+When user clicks Start:
+→ Navigate to Main Dashboard screen.
+
+--------------------------------------------------
+2. MAIN DASHBOARD
+--------------------------------------------------
+
+Layout:
+- Max width 420px centered
+- Soft pastel cozy theme
+- Rounded cards
+- Gentle shadows
+
+Top Section:
+- Display XP badge
+- Display Streak badge (🔥 icon)
+- Toggle Switches:
+    - Dark Mode toggle
+    - Motivational Messages toggle
+    - Reminder Notifications toggle
+
+--------------------------------------------------
+3. POMOPAWS SESSION SCREEN
+--------------------------------------------------
+
+Features:
+- Input field: "What are we focusing on?"
+- Duration buttons: 10m / 25m / 50m
+- Circular animated countdown timer
+- Start / Cancel button
+- Kitty displayed under timer
+
+During session:
+- Show rotating motivational messages if toggle enabled.
+- Animate kitty subtly.
+- Save session on completion:
+    {
+      purpose,
+      minutes,
+      date
+    }
+- Store in localStorage as "mochiSessions"
+
+XP System:
+- 1 minute = 1 XP
+- Store in "mochiXP"
+- Level up every 200 XP
+- Show level progress bar
+
+Streak System:
+- Completing 3 sessions in one day increases streak by 1.
+- Only increment once per day.
+- If user misses a day → reset streak.
+- Store in "mochiStreak"
+- Store last streak update date.
+
+When streak hits milestones:
+3 → Common Kitty
+7 → Rare Kitty
+14 → Epic Kitty
+30 → Legendary Kitty
+
+Show congratulatory popup + confetti.
+Store unlocked kitties in "mochiUnlockedKitties".
+
+--------------------------------------------------
+4. KITTY COLLECTION SCREEN
+--------------------------------------------------
+
+Grid layout:
+- Show unlocked kitties normally.
+- Locked kitties appear blurred/silhouetted.
+- Show rarity label.
+
+--------------------------------------------------
+5. MONTHLY HISTORY SCREEN
+--------------------------------------------------
+
+Create a Monthly Overview screen.
+
+Group sessions by month.
+
+For each month:
+- Create a stylized cozy card.
+- Example:
+   "January Focus Report ❄️"
+- Show:
+   - Total sessions
+   - Total minutes focused
+   - Highest streak reached that month
+   - Achievements unlocked
+
+Design:
+- Each month card should have a seasonal aesthetic.
+- Rounded card with pastel background.
+- Cute emoji decorations.
+
+Cards should be scrollable vertically.
+
+--------------------------------------------------
+6. SESSION HISTORY SCREEN
+--------------------------------------------------
+
+Show list of sessions:
+- Purpose
+- Minutes
+- Date
+Newest first.
+Add "Clear History" button with confirmation.
+
+--------------------------------------------------
+7. TIRED MODE (COMFORT MODE)
+--------------------------------------------------
+
+Add button: "I'm tired"
+
+When clicked:
+- Switch to cozy screen.
+- Kitty drinking coffee.
+- Floating hearts/stars animation.
+- Random comforting message:
+    - "I'm proud of you."
+    - "Rest is productive."
+    - "Small steps count."
+
+No XP affected.
+
+--------------------------------------------------
+8. FUN TASK RANDOMIZER SCREEN
+--------------------------------------------------
+
+Add button: "I don't know what to do"
+
+When clicked:
+- Randomly generate a small fun task:
+    - "Organize your desk for 5 minutes"
+    - "Read 2 pages of a book"
+    - "Stretch and breathe for 3 minutes"
+    - "Write one idea down"
+    - "Clean one small area"
+
+Tasks should be:
+- Short
+- Easy
+- Light
+
+Allow:
+- "Give me another task" button
+- Optional: Start mini 5-minute timer
+
+--------------------------------------------------
+9. REMINDER SYSTEM
+--------------------------------------------------
+
+If Reminder toggle is enabled:
+
+Check:
+- If user has not completed a session in 24 hours:
+   Show in-app banner:
+   "Mochi misses you 🐾 Ready to focus?"
+
+If browser notifications are allowed:
+   Send simple notification:
+   "Time for a gentle focus session 💛"
+
+Do not rely on service workers.
+
+--------------------------------------------------
+10. THEME SYSTEM
+--------------------------------------------------
+
+Default theme:
+Soft pastel cozy.
+
+Dark mode:
+Warm charcoal background
+Muted pink highlights
+
+Store theme preference in localStorage.
+Apply automatically on load.
+
+--------------------------------------------------
+11. UI REQUIREMENTS
+--------------------------------------------------
+
+- Fully mobile-first.
+- No fixed large pixel widths.
+- Use:
+   width: 80vw
+   max-width: 300px
+   aspect-ratio: 1/1 for timer circle.
+- Buttons full width on mobile.
+- Use rounded corners (border-radius: 16px+).
+- Soft shadows.
+- Smooth transitions.
+
+--------------------------------------------------
+12. CODE ORGANIZATION
+--------------------------------------------------
+
+Separate:
+- UI rendering functions
+- Data logic
+- XP/streak logic
+- Storage helpers
+
+Comment major logic sections clearly.
+
+--------------------------------------------------
+
+Tone:
+Wholesome.
+Encouraging.
+Cozy.
+Gentle.
+Never aggressive.
+
+This should feel like a comforting productivity companion, not a productivity pressure tool.
