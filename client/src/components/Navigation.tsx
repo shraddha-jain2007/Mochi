@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Cat, History, Coffee, Sparkles } from "lucide-react";
+import { Home, Cat, History, Coffee, Sparkles, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function Navigation() {
@@ -9,8 +9,8 @@ export function Navigation() {
     { path: "/dashboard", icon: Home, label: "Home" },
     { path: "/collection", icon: Cat, label: "Kitties" },
     { path: "/tasks", icon: Sparkles, label: "Tasks" },
+    { path: "/analytics", icon: BarChart3, label: "Stats" },
     { path: "/history", icon: History, label: "History" },
-    { path: "/tired", icon: Coffee, label: "Rest" },
   ];
 
   if (location === "/") return null;
