@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { 
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from 'recharts';
-import { format, subDays, isSameDay, startOfDay } from "date-fns";
+import { format, subDays, isSameDay } from "date-fns";
 
 export default function Analytics() {
   const { sessions, streak, xp } = useMochi();
