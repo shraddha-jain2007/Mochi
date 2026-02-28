@@ -8,7 +8,7 @@ import { KittyAvatar } from "@/components/KittyAvatar";
 
 export default function Pomodoro() {
   const [, setLocation] = useLocation();
-  const { addSession, unlockedKitties } = useMochi();
+  const { addSession, unlockedKitties, buddyId } = useMochi();
   const [minutes, setMinutes] = useState(25);
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
@@ -73,7 +73,7 @@ export default function Pomodoro() {
   const progress = ((minutes * 60 - timeLeft) / (minutes * 60)) * 100;
 
   // Use a random unlocked kitty to cheer you on
-  const companionKitty = unlockedKitties[Math.floor(Math.random() * unlockedKitties.length)];
+  const companionKitty = unlockedKitties.find(k => k.id === buddyId) || unlockedKitties[0];
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center p-6 max-w-md mx-auto">

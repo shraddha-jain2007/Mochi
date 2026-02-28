@@ -24,6 +24,7 @@ interface MochiState {
   unlockedKitties: UnlockedKitty[];
   isDarkMode: boolean;
   sessions: MochiSession[];
+  buddyId: string;
 }
 
 // Initial State
@@ -34,6 +35,7 @@ const INITIAL_STATE: MochiState = {
   unlockedKitties: [{ id: 'k1', name: 'Original Mochi', unlockedAt: new Date().toISOString() }],
   isDarkMode: false,
   sessions: [],
+  buddyId: 'k1',
 };
 
 export function useMochi() {
@@ -44,7 +46,10 @@ export function useMochi() {
   useEffect(() => {
     const saved = localStorage.getItem('mochi-data');
     if (saved) {
-      setState(JSON.parse(saved));
+      const parsed = JSON.parse(saved);
+      // Migrate old data without buddyId
+      if (!parsed.buddyId) parsed.buddyId = 'k1';
+      setState(parsed);
     }
     setIsLoaded(true);
   }, []);
@@ -74,8 +79,11 @@ export function useMochi() {
       if (newXP >= 150 && !newKitties.find(k => k.id === 'k3')) {
         newKitties.push({ id: 'k3', name: 'Chef Mochi', unlockedAt: new Date().toISOString() });
       }
-       if (newXP >= 300 && !newKitties.find(k => k.id === 'k4')) {
+      if (newXP >= 300 && !newKitties.find(k => k.id === 'k4')) {
         newKitties.push({ id: 'k4', name: 'Ninja Mochi', unlockedAt: new Date().toISOString() });
+      }
+      if (newXP >= 500 && !newKitties.find(k => k.id === 'k5')) {
+        newKitties.push({ id: 'k5', name: 'Galaxy Mochi', unlockedAt: new Date().toISOString() });
       }
 
       return { ...prev, xp: newXP, unlockedKitties: newKitties };
@@ -118,6 +126,10 @@ export function useMochi() {
     }
   };
 
+  const setBuddy = (id: string) => {
+    setState(prev => ({ ...prev, buddyId: id }));
+  };
+
   const clearHistory = () => {
     setState(prev => ({ ...prev, sessions: [] }));
   };
@@ -131,6 +143,7 @@ export function useMochi() {
     addSession,
     clearHistory,
     toggleTheme,
+    setBuddy,
     isLoaded
   };
 }
