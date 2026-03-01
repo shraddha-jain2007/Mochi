@@ -1,25 +1,45 @@
 import { useMochi } from "@/hooks/use-mochi";
 import { Link } from "wouter";
-import { ChevronLeft, TrendingUp, BarChart2, Zap, Clock, Trophy } from "lucide-react";
+import { ChevronLeft, TrendingUp, BarChart2, Zap, Clock, Trophy, Calendar, Target, Activity } from "lucide-react";
 import { motion } from "framer-motion";
 import { 
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area
 } from 'recharts';
-import { format, subDays, isSameDay } from "date-fns";
+import { format, subDays, isSameDay, getHours } from "date-fns";
 
 export default function Analytics() {
   const { sessions, streak, xp } = useMochi();
 
-  // Calculate Stats
-  const totalFocusMinutes = sessions
-    .filter(s => s.type === 'pomodoro')
-    .reduce((acc, s) => acc + s.minutes, 0);
+  // --- Data Processing for Data Science Insights ---
   
-  const avgSessionLength = sessions.length > 0 
-    ? Math.round(totalFocusMinutes / sessions.filter(s => s.type === 'pomodoro').length || 0)
+  // 1. Basic Stats
+  const pomodoroSessions = sessions.filter(s => s.type === 'pomodoro');
+  const totalFocusMinutes = pomodoroSessions.reduce((acc, s) => acc + s.minutes, 0);
+  const avgSessionLength = pomodoroSessions.length > 0 
+    ? Math.round(totalFocusMinutes / pomodoroSessions.length)
     : 0;
 
-  // Process data for Line Chart (Last 30 days)
+  // 2. Behavioral: Most Productive Hour
+  const hourCounts = new Array(24).fill(0);
+  sessions.forEach(s => {
+    const hour = getHours(new Date(s.date));
+    hourCounts[hour]++;
+  });
+  const busiestHour = hourCounts.indexOf(Math.max(...hourCounts));
+  const busiestHourLabel = busiestHour >= 12 ? `${busiestHour === 12 ? 12 : busiestHour - 12} PM` : `${busiestHour === 0 ? 12 : busiestHour} AM`;
+
+  // 3. Consistency Score (Calculated based on variance of focus time in last 7 days)
+  const last7DaysData = Array.from({ length: 7 }, (_, i) => {
+    const date = subDays(new Date(), i);
+    return sessions
+      .filter(s => isSameDay(new Date(s.date), date))
+      .reduce((acc, s) => acc + (s.type === 'pomodoro' ? s.minutes : 5), 0); // Normalized impact
+  });
+  const avg7DayFocus = last7DaysData.reduce((a, b) => a + b, 0) / 7;
+  const variance = last7DaysData.reduce((a, b) => a + Math.pow(b - avg7DayFocus, 2), 0) / 7;
+  const consistencyScore = Math.max(0, Math.min(100, Math.round(100 - (Math.sqrt(variance) / (avg7DayFocus || 1)) * 50)));
+
+  // 4. Time Series: Last 30 Days Focus
   const last30Days = Array.from({ length: 30 }, (_, i) => {
     const date = subDays(new Date(), i);
     const daySessions = sessions.filter(s => 
@@ -32,16 +52,9 @@ export default function Analytics() {
     };
   }).reverse();
 
-  // Process data for Bar Chart (Last 7 days)
-  const last7Days = Array.from({ length: 7 }, (_, i) => {
-    const date = subDays(new Date(), i);
-    const daySessions = sessions.filter(s => isSameDay(new Date(s.date), date));
-    return {
-      name: format(date, "EEE"),
-      count: daySessions.length,
-      fullDate: date
-    };
-  }).reverse();
+  // 5. Categorical: Task vs Focus Distribution
+  const tasksDone = sessions.filter(s => s.type === 'task').length;
+  const focusDone = pomodoroSessions.length;
 
   return (
     <div className="min-h-screen pb-24 px-4 pt-8 max-w-md mx-auto font-display">
@@ -51,141 +64,107 @@ export default function Analytics() {
             <ChevronLeft />
           </button>
         </Link>
-        <h2 className="text-3xl font-black text-foreground">Analytics</h2>
+        <div>
+          <h2 className="text-3xl font-black text-foreground">Insights</h2>
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Behavioral Analysis</p>
+        </div>
       </div>
 
-      {/* Quick Stats Grid */}
+      {/* Primary Science Metrics */}
       <div className="grid grid-cols-2 gap-4 mb-8">
         <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-primary/10 p-5 rounded-[2rem] border-2 border-primary/20"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-card p-5 rounded-[2.5rem] border-2 border-primary/20 shadow-xl shadow-primary/5 flex flex-col items-center text-center"
         >
-          <Clock className="text-primary mb-2" size={20} />
-          <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Total Focus</p>
-          <h3 className="text-2xl font-black text-primary">{totalFocusMinutes}m</h3>
+          <Activity className="text-primary mb-2" size={24} />
+          <h3 className="text-3xl font-black text-primary">{consistencyScore}%</h3>
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Consistency</p>
         </motion.div>
         
         <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1 }}
-          className="bg-secondary/20 p-5 rounded-[2rem] border-2 border-secondary/30"
+          className="bg-card p-5 rounded-[2.5rem] border-2 border-secondary/30 shadow-xl shadow-secondary/5 flex flex-col items-center text-center"
         >
-          <Zap className="text-secondary-foreground mb-2" size={20} />
-          <p className="text-[10px] font-black uppercase tracking-widest text-secondary-foreground/60">Avg Session</p>
-          <h3 className="text-2xl font-black text-secondary-foreground">{avgSessionLength}m</h3>
-        </motion.div>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-accent/20 p-5 rounded-[2rem] border-2 border-accent/30"
-        >
-          <TrendingUp className="text-accent-foreground mb-2" size={20} />
-          <p className="text-[10px] font-black uppercase tracking-widest text-accent-foreground/60">Streak</p>
-          <h3 className="text-2xl font-black text-accent-foreground">{streak}d</h3>
-        </motion.div>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-card p-5 rounded-[2rem] border-2 border-border shadow-sm"
-        >
-          <Trophy className="text-orange-400 mb-2" size={20} />
-          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total XP</p>
-          <h3 className="text-2xl font-black text-foreground">{xp}</h3>
+          <Clock className="text-secondary-foreground mb-2" size={24} />
+          <h3 className="text-2xl font-black text-secondary-foreground">{busiestHourLabel}</h3>
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Peak Hour</p>
         </motion.div>
       </div>
 
-      {/* Focus Minutes Chart */}
+      {/* Focus Trend (Area Chart for 'Flow' visual) */}
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         className="bg-card p-6 rounded-[2.5rem] border-2 border-border shadow-sm mb-6"
       >
-        <div className="flex items-center gap-2 mb-6">
-          <div className="p-2 bg-primary/10 rounded-xl">
-            <BarChart2 size={18} className="text-primary" />
-          </div>
-          <h3 className="font-black text-lg">Focus Time (30d)</h3>
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="font-black text-lg flex items-center gap-2">
+            <TrendingUp size={18} className="text-primary" /> Focus Flow
+          </h3>
+          <span className="text-[10px] font-bold bg-muted px-2 py-1 rounded-full text-muted-foreground uppercase">Last 30 Days</span>
         </div>
         
         <div className="h-48 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={last30Days}>
+            <AreaChart data={last30Days}>
+              <defs>
+                <linearGradient id="colorMin" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" />
-              <XAxis 
-                dataKey="date" 
-                hide 
-              />
+              <XAxis dataKey="date" hide />
               <YAxis hide />
               <Tooltip 
                 contentStyle={{ 
-                  borderRadius: '1rem', 
+                  borderRadius: '1.5rem', 
                   border: 'none', 
                   boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                  fontFamily: 'Fredoka'
+                  fontFamily: 'Fredoka',
+                  fontWeight: 'bold'
                 }}
               />
-              <Line 
+              <Area 
                 type="monotone" 
                 dataKey="minutes" 
                 stroke="hsl(var(--primary))" 
-                strokeWidth={4} 
-                dot={false}
-                activeDot={{ r: 6, fill: "hsl(var(--primary))", strokeWidth: 0 }}
+                strokeWidth={4}
+                fillOpacity={1} 
+                fill="url(#colorMin)" 
               />
-            </LineChart>
+            </AreaChart>
           </ResponsiveContainer>
         </div>
       </motion.div>
 
-      {/* Sessions Chart */}
+      {/* Task Distribution */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="bg-primary/5 p-6 rounded-[2.5rem] border-2 border-primary/10">
+          <p className="text-4xl mb-2">🌸</p>
+          <h4 className="text-2xl font-black text-primary">{focusDone}</h4>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Deep Focus</p>
+        </div>
+        <div className="bg-secondary/10 p-6 rounded-[2.5rem] border-2 border-secondary/20">
+          <p className="text-4xl mb-2">✅</p>
+          <h4 className="text-2xl font-black text-secondary-foreground">{tasksDone}</h4>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Micro Tasks</p>
+        </div>
+      </div>
+
+      {/* Science Tidbit */}
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.2 }}
-        className="bg-card p-6 rounded-[2.5rem] border-2 border-border shadow-sm mb-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="p-6 bg-accent/10 rounded-[2.5rem] border-2 border-dashed border-accent/30 text-center"
       >
-        <div className="flex items-center gap-2 mb-6">
-          <div className="p-2 bg-secondary/20 rounded-xl">
-            <Zap size={18} className="text-secondary-foreground" />
-          </div>
-          <h3 className="font-black text-lg">Sessions (7d)</h3>
-        </div>
-        
-        <div className="h-48 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={last7Days}>
-              <XAxis 
-                dataKey="name" 
-                axisLine={false} 
-                tickLine={false} 
-                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12, fontWeight: 700 }}
-              />
-              <Tooltip 
-                cursor={{ fill: 'transparent' }}
-                contentStyle={{ 
-                  borderRadius: '1rem', 
-                  border: 'none', 
-                  boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                  fontFamily: 'Fredoka'
-                }}
-              />
-              <Bar dataKey="count" radius={[10, 10, 10, 10]}>
-                {last7Days.map((entry, index) => (
-                  <Cell 
-                    key={`cell-${index}`} 
-                    fill={isSameDay(entry.fullDate, new Date()) ? 'hsl(var(--primary))' : 'hsl(var(--secondary))'} 
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <Target className="mx-auto mb-2 text-accent-foreground" size={20} />
+        <p className="text-xs font-medium text-accent-foreground leading-relaxed">
+          Your current <span className="font-black">Focus Intensity</span> is optimized when you work around {busiestHourLabel}. Keep your consistency above 80% to maximize Mochi XP!
+        </p>
       </motion.div>
     </div>
   );
