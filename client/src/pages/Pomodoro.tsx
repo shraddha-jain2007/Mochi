@@ -148,6 +148,13 @@ export default function Pomodoro() {
             exit={{ opacity: 0, scale: 0.95 }}
             className="flex flex-col items-center w-full"
           >
+            <div className="flex flex-col items-center gap-4 mb-8">
+              <KittyAvatar id={companionKitty.id} isUnlocked={true} size="xl" />
+              <p className="text-sm text-muted-foreground text-center animate-pulse font-bold">
+                {companionKitty.name} is focusing with you!
+              </p>
+            </div>
+
             <div className="relative w-64 h-64 mb-8 flex items-center justify-center">
               {/* Circular Progress SVG */}
               <svg className="w-full h-full transform -rotate-90">
@@ -184,14 +191,7 @@ export default function Pomodoro() {
               </div>
             </div>
 
-            <div className="flex flex-col items-center gap-4">
-              <KittyAvatar id={companionKitty.id} isUnlocked={true} size="md" />
-              <p className="text-sm text-muted-foreground text-center animate-pulse">
-                {companionKitty.name} is cheering for you!
-              </p>
-            </div>
-
-            <div className="flex gap-4 mt-12">
+            <div className="flex gap-4 mt-4">
               <button
                 onClick={() => setIsActive(!isActive)}
                 className="p-4 rounded-full bg-secondary text-secondary-foreground shadow-lg hover:scale-105 transition-transform"
