@@ -7,6 +7,8 @@ export interface MochiSession {
   minutes: number;
   date: string;
   type: 'pomodoro' | 'task';
+  subject?: string;
+  notes?: string;
 }
 
 export interface UnlockedKitty {
@@ -28,7 +30,7 @@ export interface Habit {
   id: number;
   name: string;
   emoji: string;
-  completions: string[]; // Array of date strings "YYYY-MM-DD"
+  completions: string[]; // Array of "YYYY-MM-DD"
   color: string;
   createdAt: string;
 }
@@ -44,6 +46,7 @@ interface MochiState {
   buddyId: string;
   todos: TodoItem[];
   habits: Habit[];
+  dailyGoalMinutes: number;
 }
 
 const INITIAL_STATE: MochiState = {
@@ -57,6 +60,7 @@ const INITIAL_STATE: MochiState = {
   buddyId: 'k1',
   todos: [],
   habits: [],
+  dailyGoalMinutes: 60,
 };
 
 export function useMochi() {
@@ -71,6 +75,7 @@ export function useMochi() {
       if (!parsed.username) parsed.username = '';
       if (!parsed.todos) parsed.todos = [];
       if (!parsed.habits) parsed.habits = [];
+      if (!parsed.dailyGoalMinutes) parsed.dailyGoalMinutes = 60;
       setState(parsed);
     }
     setIsLoaded(true);
@@ -87,22 +92,22 @@ export function useMochi() {
     }
   }, [state, isLoaded]);
 
-  const setUsername = (name: string) => {
-    setState(prev => ({ ...prev, username: name }));
-  };
+  const setUsername = (name: string) => setState(prev => ({ ...prev, username: name }));
+
+  const setDailyGoal = (minutes: number) => setState(prev => ({ ...prev, dailyGoalMinutes: minutes }));
 
   const addXP = (amount: number) => {
     setState(prev => {
       const newXP = prev.xp + amount;
       const newKitties = [...prev.unlockedKitties];
-      if (newXP >= 50 && !newKitties.find(k => k.id === 'k2'))
-        newKitties.push({ id: 'k2', name: 'Sleepy Mochi', unlockedAt: new Date().toISOString() });
+      if (newXP >= 50  && !newKitties.find(k => k.id === 'k2'))
+        newKitties.push({ id: 'k2', name: 'Sleepy Mochi',  unlockedAt: new Date().toISOString() });
       if (newXP >= 150 && !newKitties.find(k => k.id === 'k3'))
-        newKitties.push({ id: 'k3', name: 'Chef Mochi', unlockedAt: new Date().toISOString() });
+        newKitties.push({ id: 'k3', name: 'Chef Mochi',    unlockedAt: new Date().toISOString() });
       if (newXP >= 300 && !newKitties.find(k => k.id === 'k4'))
-        newKitties.push({ id: 'k4', name: 'Ninja Mochi', unlockedAt: new Date().toISOString() });
+        newKitties.push({ id: 'k4', name: 'Ninja Mochi',   unlockedAt: new Date().toISOString() });
       if (newXP >= 500 && !newKitties.find(k => k.id === 'k5'))
-        newKitties.push({ id: 'k5', name: 'Galaxy Mochi', unlockedAt: new Date().toISOString() });
+        newKitties.push({ id: 'k5', name: 'Galaxy Mochi',  unlockedAt: new Date().toISOString() });
       return { ...prev, xp: newXP, unlockedKitties: newKitties };
     });
   };
@@ -113,12 +118,7 @@ export function useMochi() {
       if (prev.lastSessionDate === today) return prev;
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
-      let newStreak = prev.streak;
-      if (prev.lastSessionDate === yesterday.toDateString()) {
-        newStreak += 1;
-      } else {
-        newStreak = 1;
-      }
+      const newStreak = prev.lastSessionDate === yesterday.toDateString() ? prev.streak + 1 : 1;
       return { ...prev, streak: newStreak, lastSessionDate: today };
     });
   };
@@ -134,41 +134,25 @@ export function useMochi() {
     }
   };
 
-  const setBuddy = (id: string) => {
-    setState(prev => ({ ...prev, buddyId: id }));
-  };
+  const setBuddy    = (id: string) => setState(prev => ({ ...prev, buddyId: id }));
+  const clearHistory = ()          => setState(prev => ({ ...prev, sessions: [] }));
+  const toggleTheme  = ()          => setState(prev => ({ ...prev, isDarkMode: !prev.isDarkMode }));
 
-  const clearHistory = () => {
-    setState(prev => ({ ...prev, sessions: [] }));
-  };
-
-  const toggleTheme = () => {
-    setState(prev => ({ ...prev, isDarkMode: !prev.isDarkMode }));
-  };
-
-  // --- Todo actions ---
+  // --- Todo ---
   const addTodo = (text: string, priority: TodoItem['priority'] = 'medium', category = 'General') => {
     const todo: TodoItem = { id: Date.now(), text, done: false, priority, category, createdAt: new Date().toISOString() };
     setState(prev => ({ ...prev, todos: [todo, ...prev.todos] }));
   };
-
-  const toggleTodo = (id: number) => {
-    setState(prev => ({
-      ...prev,
-      todos: prev.todos.map(t => t.id === id ? { ...t, done: !t.done } : t)
-    }));
-  };
-
-  const deleteTodo = (id: number) => {
+  const toggleTodo = (id: number) =>
+    setState(prev => ({ ...prev, todos: prev.todos.map(t => t.id === id ? { ...t, done: !t.done } : t) }));
+  const deleteTodo = (id: number) =>
     setState(prev => ({ ...prev, todos: prev.todos.filter(t => t.id !== id) }));
-  };
 
-  // --- Habit actions ---
+  // --- Habits ---
   const addHabit = (name: string, emoji: string, color: string) => {
     const habit: Habit = { id: Date.now(), name, emoji, completions: [], color, createdAt: new Date().toISOString() };
     setState(prev => ({ ...prev, habits: [habit, ...prev.habits] }));
   };
-
   const toggleHabit = (id: number) => {
     const today = new Date().toISOString().split('T')[0];
     setState(prev => ({
@@ -176,19 +160,33 @@ export function useMochi() {
       habits: prev.habits.map(h => {
         if (h.id !== id) return h;
         const already = h.completions.includes(today);
-        return {
-          ...h,
-          completions: already
-            ? h.completions.filter(d => d !== today)
-            : [...h.completions, today]
-        };
+        return { ...h, completions: already ? h.completions.filter(d => d !== today) : [...h.completions, today] };
       })
     }));
     addXP(2);
   };
-
-  const deleteHabit = (id: number) => {
+  const deleteHabit = (id: number) =>
     setState(prev => ({ ...prev, habits: prev.habits.filter(h => h.id !== id) }));
+
+  // --- Data Export ---
+  const exportCSV = () => {
+    const rows = [
+      ['id','purpose','subject','minutes','date','type','notes'],
+      ...state.sessions.map(s => [
+        s.id, `"${s.purpose}"`, `"${s.subject || ''}"`, s.minutes, s.date, s.type, `"${s.notes || ''}"`
+      ])
+    ];
+    const blob = new Blob([rows.map(r => r.join(',')).join('\n')], { type: 'text/csv' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a'); a.href = url; a.download = 'mochi-sessions.csv'; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportJSON = () => {
+    const blob = new Blob([JSON.stringify({ sessions: state.sessions, habits: state.habits, todos: state.todos, xp: state.xp, streak: state.streak }, null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a'); a.href = url; a.download = 'mochi-data.json'; a.click();
+    URL.revokeObjectURL(url);
   };
 
   return {
@@ -198,12 +196,10 @@ export function useMochi() {
     toggleTheme,
     setBuddy,
     setUsername,
-    addTodo,
-    toggleTodo,
-    deleteTodo,
-    addHabit,
-    toggleHabit,
-    deleteHabit,
+    setDailyGoal,
+    addTodo, toggleTodo, deleteTodo,
+    addHabit, toggleHabit, deleteHabit,
+    exportCSV, exportJSON,
     isLoaded
   };
 }
