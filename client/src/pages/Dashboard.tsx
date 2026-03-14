@@ -13,17 +13,25 @@ import {
 } from "@/components/ui/dialog";
 
 const QUICK_ACTIONS = [
-  { href: '/pomodoro', emoji: '⏱️', label: 'Focus', sub: 'Start Timer', color: 'from-pink-400 to-rose-400', shadow: 'shadow-rose-200 dark:shadow-rose-900/30' },
-  { href: '/tasks',   emoji: '🎲', label: 'Tasks', sub: 'Randomize', color: 'from-violet-400 to-purple-400', shadow: 'shadow-violet-200 dark:shadow-violet-900/30' },
+  {
+    href: '/pomodoro', emoji: '⏱️', label: 'Focus', sub: 'Start Timer',
+    gradient: 'linear-gradient(135deg, #f472b6, #fb7185)',
+    shadow: '0 8px 0 0 #be185d, 0 12px 24px rgba(244,114,182,0.3)',
+  },
+  {
+    href: '/tasks', emoji: '🎲', label: 'Tasks', sub: 'Randomize',
+    gradient: 'linear-gradient(135deg, #c084fc, #a78bfa)',
+    shadow: '0 8px 0 0 #7c3aed, 0 12px 24px rgba(192,132,252,0.3)',
+  },
 ];
 
 const SECONDARY_ACTIONS = [
-  { href: '/todo', icon: CheckSquare, label: 'To-Do', color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
-  { href: '/habits', icon: Activity, label: 'Habits', color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-  { href: '/analytics', icon: BarChart3, label: 'Stats', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20' },
-  { href: '/friends', icon: Users, label: 'Friends', color: 'text-pink-500', bg: 'bg-pink-50 dark:bg-pink-900/20' },
-  { href: '/collection', icon: Cat, label: 'Kitties', color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20' },
-  { href: '/history', icon: History, label: 'History', color: 'text-slate-500', bg: 'bg-slate-50 dark:bg-slate-800/40' },
+  { href: '/todo',       icon: CheckSquare, label: 'To-Do',   bg: 'bg-emerald-50 dark:bg-emerald-900/20', color: 'text-emerald-500', ring: 'hover:ring-emerald-200' },
+  { href: '/habits',     icon: Activity,    label: 'Habits',  bg: 'bg-blue-50 dark:bg-blue-900/20',       color: 'text-blue-500',    ring: 'hover:ring-blue-200' },
+  { href: '/analytics',  icon: BarChart3,   label: 'Stats',   bg: 'bg-amber-50 dark:bg-amber-900/20',     color: 'text-amber-500',   ring: 'hover:ring-amber-200' },
+  { href: '/friends',    icon: Users,       label: 'Friends', bg: 'bg-pink-50 dark:bg-pink-900/20',       color: 'text-pink-500',    ring: 'hover:ring-pink-200' },
+  { href: '/collection', icon: Cat,         label: 'Kitties', bg: 'bg-purple-50 dark:bg-purple-900/20',   color: 'text-purple-500',  ring: 'hover:ring-purple-200' },
+  { href: '/history',    icon: History,     label: 'History', bg: 'bg-rose-50 dark:bg-rose-900/20',       color: 'text-rose-400',    ring: 'hover:ring-rose-200' },
 ];
 
 export default function Dashboard() {
@@ -32,81 +40,99 @@ export default function Dashboard() {
   const todayStr = new Date().toISOString().split('T')[0];
   const habitsDoneToday = habits.filter(h => h.completions.includes(todayStr)).length;
   const todosLeft = todos.filter(t => !t.done).length;
+  const level = Math.floor(xp / 100) + 1;
 
   return (
-    <div className="min-h-screen pb-32 px-4 pt-6 max-w-md mx-auto">
+    <div className="min-h-screen pb-36 px-4 pt-6 max-w-md mx-auto">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-3xl font-black font-display text-foreground leading-tight">Hi, Mochi! 🐾</h2>
-          <p className="text-muted-foreground font-medium text-sm">Let's have a cozy day.</p>
+          <div className="flex items-center gap-2">
+            <h2 className="text-3xl font-black text-foreground leading-tight" style={{ fontFamily: 'Fredoka, sans-serif' }}>
+              Hi, Mochi!
+            </h2>
+            <span className="text-2xl animate-wiggle inline-block">🐾</span>
+          </div>
+          <p className="text-muted-foreground text-sm font-semibold">
+            <span style={{ fontFamily: 'Dancing Script, cursive', fontSize: '1rem' }}>let's have a cozy day ✨</span>
+          </p>
         </div>
         <button
           onClick={toggleTheme}
-          className="p-3 rounded-2xl bg-card shadow-sm border border-border hover:bg-muted transition-colors btn-bounce"
+          className="p-3 rounded-2xl bg-white/70 dark:bg-white/10 shadow-sm border border-pink-100 dark:border-white/10 hover:bg-pink-50 transition-colors btn-bounce backdrop-blur-sm"
         >
           {isDarkMode ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-indigo-400" />}
         </button>
       </div>
 
-      {/* Hero Stats Card */}
+      {/* Hero XP Card */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden bg-gradient-to-br from-primary/80 to-rose-400 rounded-[2.5rem] p-6 mb-6 shadow-2xl shadow-primary/20"
+        className="relative overflow-hidden rounded-[2.5rem] p-6 mb-5 shadow-2xl"
+        style={{
+          background: 'linear-gradient(135deg, #f9a8d4, #c084fc, #f472b6)',
+          boxShadow: '0 20px 40px rgba(244,114,182,0.25)',
+        }}
       >
         {/* Decorative blobs */}
-        <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-white/10 blur-xl" />
+        <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-white/15 blur-2xl" />
+        <div className="absolute -bottom-8 -left-8 w-28 h-28 rounded-full bg-white/10 blur-xl" />
+        <div className="absolute top-4 right-8 text-2xl animate-sparkle">✨</div>
+        <div className="absolute bottom-6 right-16 text-xl animate-sparkle" style={{ animationDelay: '1s' }}>⭐</div>
 
-        <div className="relative z-10 flex items-center gap-5">
-          <div className="relative">
-            <KittyAvatar id={mainKitty.id} isUnlocked={true} size="lg" className="border-4 border-white/40" />
-            <div className="absolute -bottom-1 -right-1 text-xl">✨</div>
-          </div>
-          <div className="flex-1 text-primary-foreground">
-            <div className="flex items-center gap-2 mb-1 opacity-80">
-              <Trophy size={14} />
-              <span className="text-xs font-black uppercase tracking-widest">Level {Math.floor(xp / 100) + 1}</span>
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="relative flex-shrink-0">
+            <div className="rounded-[1.5rem] border-4 border-white/50 overflow-hidden shadow-xl">
+              <KittyAvatar id={mainKitty.id} isUnlocked={true} size="lg" />
             </div>
-            <h3 className="text-4xl font-black font-display">
+            <div className="absolute -bottom-1 -right-1 text-xl animate-heartbeat">💖</div>
+          </div>
+
+          <div className="flex-1 text-white min-w-0">
+            <div className="flex items-center gap-1.5 mb-0.5 opacity-90">
+              <Trophy size={13} />
+              <span className="text-[11px] font-black uppercase tracking-widest">Level {level}</span>
+            </div>
+            <h3 className="text-4xl font-black leading-none mb-2" style={{ fontFamily: 'Fredoka, sans-serif' }}>
               <AnimatedCounter value={xp} /> XP
             </h3>
-
-            {/* XP Progress bar to next level */}
-            <div className="h-1.5 bg-white/20 rounded-full mt-2 mb-3 overflow-hidden w-full">
-              <div
-                className="h-full bg-white/70 rounded-full transition-all duration-700"
-                style={{ width: `${(xp % 100)}%` }}
+            {/* XP bar */}
+            <div className="h-2 bg-white/25 rounded-full overflow-hidden mb-3 w-full">
+              <motion.div
+                className="h-full bg-white/80 rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${xp % 100}%` }}
+                transition={{ duration: 0.8, delay: 0.3 }}
               />
             </div>
-
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 bg-white/20 px-3 py-1 rounded-full">
-                <Flame size={14} fill="currentColor" />
-                <span className="text-sm font-black">{streak}d</span>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20">
+                <Flame size={14} className="text-orange-200" fill="currentColor" />
+                <span className="text-sm font-black">{streak} day streak</span>
               </div>
-
               <Dialog>
                 <DialogTrigger asChild>
-                  <button className="flex items-center gap-1 text-xs font-bold opacity-70 hover:opacity-100 transition-opacity">
-                    <Info size={12} /> How to grow?
+                  <button className="text-xs font-bold opacity-70 hover:opacity-100 transition-opacity flex items-center gap-1">
+                    <Info size={11} /> tips
                   </button>
                 </DialogTrigger>
-                <DialogContent className="rounded-[2rem]">
+                <DialogContent className="rounded-[2.5rem] border-2 border-pink-100">
                   <DialogHeader>
-                    <DialogTitle className="text-2xl font-black text-center">Grow Your Streak 🐾</DialogTitle>
+                    <DialogTitle className="text-2xl font-black text-center" style={{ fontFamily: 'Fredoka' }}>
+                      Streak Tips 🌸
+                    </DialogTitle>
                   </DialogHeader>
-                  <div className="space-y-4 py-4 font-medium text-center">
-                    <div className="bg-primary/10 p-4 rounded-3xl space-y-1">
-                      <p className="text-primary font-black">Focus daily</p>
-                      <p className="text-sm">Complete at least one focus session every day to keep the flame alive.</p>
+                  <div className="space-y-3 py-4 text-center font-semibold">
+                    <div className="bg-pink-50 dark:bg-pink-900/20 p-4 rounded-3xl">
+                      <p className="font-black text-pink-500">🌸 Focus every day</p>
+                      <p className="text-sm text-muted-foreground mt-1">Complete at least one Pomodoro to keep the streak alive!</p>
                     </div>
-                    <div className="bg-secondary/20 p-4 rounded-3xl space-y-1">
-                      <p className="text-secondary-foreground font-black">Earn XP</p>
-                      <p className="text-sm">Every minute focused gives 1 XP. Tasks give 5 XP. Habits give 2 XP!</p>
+                    <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-3xl">
+                      <p className="font-black text-purple-500">✨ Earn XP</p>
+                      <p className="text-sm text-muted-foreground mt-1">1 XP/min focus · 5 XP task · 2 XP habit · Level up every 100!</p>
                     </div>
-                    <p className="text-xs text-muted-foreground italic">Miss a day and the streak resets. You can do it! 🌸</p>
+                    <p className="text-xs text-muted-foreground italic">Miss a day and the flame goes out 🔥 Don't let Mochi down!</p>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -115,93 +141,100 @@ export default function Dashboard() {
         </div>
       </motion.div>
 
-      {/* Today's snapshot */}
+      {/* Today snapshot */}
       {(habits.length > 0 || todos.length > 0) && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="grid grid-cols-2 gap-3 mb-6"
-        >
+        <div className="grid grid-cols-2 gap-3 mb-5">
           <Link href="/habits">
-            <div className="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200/60 dark:border-blue-700/30 p-4 rounded-[2rem] flex items-center gap-3">
-              <Activity className="text-blue-500" size={22} />
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bg-white/60 dark:bg-blue-900/20 border-2 border-blue-200/50 dark:border-blue-700/30 p-4 rounded-[2rem] flex items-center gap-3 shadow-sm backdrop-blur-sm"
+            >
+              <div className="text-2xl animate-float">🌊</div>
               <div>
-                <p className="font-black text-blue-700 dark:text-blue-300">{habitsDoneToday}/{habits.length}</p>
-                <p className="text-[10px] font-black uppercase tracking-widest text-blue-500/70">Habits Today</p>
+                <p className="font-black text-blue-600 dark:text-blue-300 text-lg">{habitsDoneToday}/{habits.length}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-blue-400/80">habits today</p>
               </div>
-            </div>
+            </motion.div>
           </Link>
           <Link href="/todo">
-            <div className="bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-200/60 dark:border-emerald-700/30 p-4 rounded-[2rem] flex items-center gap-3">
-              <CheckSquare className="text-emerald-500" size={22} />
+            <motion.div
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bg-white/60 dark:bg-emerald-900/20 border-2 border-emerald-200/50 dark:border-emerald-700/30 p-4 rounded-[2rem] flex items-center gap-3 shadow-sm backdrop-blur-sm"
+            >
+              <div className="text-2xl animate-float" style={{ animationDelay: '0.5s' }}>📝</div>
               <div>
-                <p className="font-black text-emerald-700 dark:text-emerald-300">{todosLeft}</p>
-                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500/70">Tasks Left</p>
+                <p className="font-black text-emerald-600 dark:text-emerald-300 text-lg">{todosLeft}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400/80">tasks left</p>
               </div>
-            </div>
+            </motion.div>
           </Link>
-        </motion.div>
+        </div>
       )}
 
-      {/* Primary Action Cards */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        {QUICK_ACTIONS.map((action, i) => (
-          <Link key={action.href} href={action.href}>
+      {/* Main action cards */}
+      <div className="grid grid-cols-2 gap-4 mb-5">
+        {QUICK_ACTIONS.map((a, i) => (
+          <Link key={a.href} href={a.href}>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
-              whileHover={{ scale: 1.04, rotate: i % 2 === 0 ? -1 : 1 }}
-              whileTap={{ scale: 0.96 }}
-              className={`bg-gradient-to-br ${action.color} p-6 rounded-[2rem] flex flex-col items-center justify-center gap-3 cursor-pointer h-44 shadow-xl ${action.shadow}`}
+              transition={{ delay: i * 0.1 }}
+              whileHover={{ scale: 1.05, rotate: i % 2 === 0 ? -1 : 1 }}
+              whileTap={{ scale: 0.93 }}
+              className="h-44 rounded-[2.5rem] p-5 flex flex-col items-center justify-center gap-3 cursor-pointer relative overflow-hidden"
+              style={{ background: a.gradient, boxShadow: a.shadow }}
             >
-              <span className="text-5xl">{action.emoji}</span>
-              <div className="text-center text-white">
-                <h3 className="font-black text-xl leading-none">{action.label}</h3>
-                <p className="text-xs font-bold uppercase tracking-widest opacity-80 mt-0.5">{action.sub}</p>
+              <div className="absolute top-3 right-4 text-white/20 text-6xl font-black select-none" style={{ fontFamily: 'Fredoka' }}>
+                {a.emoji}
+              </div>
+              <span className="text-5xl relative z-10 animate-float2" style={{ animationDelay: `${i * 0.4}s` }}>{a.emoji}</span>
+              <div className="text-center text-white relative z-10">
+                <h3 className="font-black text-xl leading-none" style={{ fontFamily: 'Fredoka' }}>{a.label}</h3>
+                <p className="text-[11px] font-bold uppercase tracking-widest opacity-80 mt-0.5">{a.sub}</p>
               </div>
             </motion.div>
           </Link>
         ))}
       </div>
 
-      {/* Secondary Grid */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        {SECONDARY_ACTIONS.map((action, i) => {
-          const Icon = action.icon;
+      {/* Secondary grid */}
+      <div className="grid grid-cols-3 gap-3 mb-5">
+        {SECONDARY_ACTIONS.map((a, i) => {
+          const Icon = a.icon;
           return (
-            <Link key={action.href} href={action.href}>
+            <Link key={a.href} href={a.href}>
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.85 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 + i * 0.05 }}
-                whileTap={{ scale: 0.93 }}
-                className={`${action.bg} border-2 border-transparent p-4 rounded-[2rem] flex flex-col items-center gap-2 cursor-pointer hover:border-current transition-all`}
+                transition={{ delay: 0.2 + i * 0.06 }}
+                whileTap={{ scale: 0.9 }}
+                className={`${a.bg} border-2 border-transparent hover:ring-2 ${a.ring} p-4 rounded-[2rem] flex flex-col items-center gap-2 cursor-pointer transition-all backdrop-blur-sm`}
               >
-                <Icon size={24} className={action.color} />
-                <span className={`text-[10px] font-black uppercase tracking-widest ${action.color}`}>{action.label}</span>
+                <Icon size={22} className={a.color} />
+                <span className={`text-[10px] font-black uppercase tracking-widest ${a.color}`}>{a.label}</span>
               </motion.div>
             </Link>
           );
         })}
       </div>
 
-      {/* Kitty Friends Teaser */}
-      <div className="bg-card border-2 border-dashed border-muted-foreground/20 p-5 rounded-[2.5rem]">
+      {/* Kitty friends strip */}
+      <div className="bg-white/50 dark:bg-white/5 border-2 border-dashed border-pink-200/60 dark:border-pink-800/30 p-5 rounded-[2.5rem] backdrop-blur-sm">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-black text-lg flex items-center gap-2">
-            My Friends <span className="text-xs font-black bg-primary/10 text-primary px-2 py-0.5 rounded-full">{unlockedKitties.length}</span>
+          <h3 className="font-black text-lg" style={{ fontFamily: 'Fredoka' }}>
+            My Kitties <span className="text-sm font-black bg-pink-100 dark:bg-pink-900/30 text-pink-400 px-2 py-0.5 rounded-full ml-1">{unlockedKitties.length}</span>
           </h3>
-          <Link href="/collection" className="text-primary text-sm font-black flex items-center gap-0.5 hover:gap-1.5 transition-all">
-            All <ChevronRight size={16} />
+          <Link href="/collection" className="text-primary text-sm font-black flex items-center gap-0.5 hover:gap-2 transition-all">
+            See all <ChevronRight size={15} />
           </Link>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-1 no-scrollbar">
           {unlockedKitties.map((kitty, i) => (
             <div key={kitty.id} className="flex flex-col items-center gap-1.5 min-w-[60px] animate-float" style={{ animationDelay: `${i * 0.5}s` }}>
               <KittyAvatar id={kitty.id} isUnlocked={true} size="sm" />
-              <span className="text-[9px] font-black uppercase tracking-tighter truncate w-full text-center opacity-50">{kitty.name.split(' ')[0]}</span>
+              <span className="text-[9px] font-black uppercase tracking-tighter truncate w-full text-center text-muted-foreground">{kitty.name.split(' ')[0]}</span>
             </div>
           ))}
         </div>

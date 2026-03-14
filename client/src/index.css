@@ -1,85 +1,97 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Fredoka:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka:wght@300;400;500;600;700&family=Dancing+Script:wght@600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Soft Artsy Cozy Theme */
   --font-sans: 'Nunito', sans-serif;
   --font-display: 'Fredoka', sans-serif;
+  --font-script: 'Dancing Script', cursive;
 
-  --background: 35 40% 98%;      /* Warm cream white */
-  --foreground: 20 20% 20%;      /* Soft warm dark */
+  /* Girlish Pastel Palette */
+  --background: 340 60% 98%;
+  --foreground: 330 25% 22%;
 
   --card: 0 0% 100%;
-  --card-foreground: 20 20% 20%;
+  --card-foreground: 330 25% 22%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 20 20% 20%;
+  --popover-foreground: 330 25% 22%;
 
-  --primary: 345 70% 75%;         /* Mochi Pink */
-  --primary-foreground: 345 20% 98%;
+  --primary: 340 80% 72%;        /* Bubblegum Pink */
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 160 50% 90%;       /* Minty Green */
-  --secondary-foreground: 160 40% 30%;
+  --secondary: 275 60% 88%;      /* Soft Lavender */
+  --secondary-foreground: 275 40% 35%;
 
-  --muted: 35 30% 95%;
-  --muted-foreground: 20 10% 45%;
+  --muted: 340 40% 96%;
+  --muted-foreground: 330 15% 50%;
 
-  --accent: 45 90% 80%;           /* Soft Yellow */
-  --accent-foreground: 45 40% 30%;
+  --accent: 18 90% 82%;          /* Peachy Coral */
+  --accent-foreground: 18 50% 30%;
 
   --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 98%;
+  --destructive-foreground: 0 0% 100%;
 
-  --border: 35 20% 90%;
-  --input: 35 20% 90%;
-  --ring: 345 70% 75%;
+  --border: 340 30% 91%;
+  --input: 340 30% 91%;
+  --ring: 340 80% 72%;
 
-  --radius: 2rem; /* Extra rounded for artsy feel */
+  --radius: 2rem;
 }
 
 .dark {
-  --background: 240 10% 10%;      /* Warm deep charcoal */
-  --foreground: 35 30% 95%;
+  --background: 280 20% 10%;
+  --foreground: 340 40% 95%;
 
-  --card: 240 10% 14%;
-  --card-foreground: 35 30% 95%;
+  --card: 280 18% 14%;
+  --card-foreground: 340 40% 95%;
 
-  --popover: 240 10% 14%;
-  --popover-foreground: 35 30% 95%;
+  --popover: 280 18% 14%;
+  --popover-foreground: 340 40% 95%;
 
-  --primary: 345 60% 65%;
-  --primary-foreground: 345 20% 98%;
+  --primary: 340 70% 65%;
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 160 30% 20%;
-  --secondary-foreground: 160 60% 90%;
+  --secondary: 275 30% 22%;
+  --secondary-foreground: 275 60% 88%;
 
-  --muted: 240 10% 18%;
-  --muted-foreground: 215 20% 60%;
+  --muted: 280 18% 18%;
+  --muted-foreground: 330 20% 58%;
 
-  --accent: 45 60% 50%;
-  --accent-foreground: 240 10% 10%;
+  --accent: 18 60% 55%;
+  --accent-foreground: 280 20% 10%;
 
   --destructive: 0 62% 30%;
   --destructive-foreground: 0 85% 90%;
 
-  --border: 240 10% 20%;
-  --input: 240 10% 20%;
-  --ring: 345 60% 65%;
+  --border: 280 18% 22%;
+  --input: 280 18% 22%;
+  --ring: 340 70% 65%;
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
+
   body {
     @apply bg-background text-foreground antialiased transition-colors duration-500;
     font-family: var(--font-sans);
-    background-image: radial-gradient(circle at 2px 2px, hsl(var(--muted)) 1px, transparent 0);
-    background-size: 40px 40px;
+    background-image:
+      radial-gradient(circle, hsl(340 80% 85% / 0.35) 1px, transparent 1px),
+      radial-gradient(circle, hsl(275 60% 80% / 0.2) 1px, transparent 1px);
+    background-size: 28px 28px, 14px 14px;
+    background-position: 0 0, 7px 7px;
   }
+
+  .dark body, .dark {
+    background-image:
+      radial-gradient(circle, hsl(340 50% 40% / 0.15) 1px, transparent 1px),
+      radial-gradient(circle, hsl(275 40% 35% / 0.1) 1px, transparent 1px);
+    background-size: 28px 28px, 14px 14px;
+    background-position: 0 0, 7px 7px;
+  }
+
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     @apply font-bold tracking-tight;
@@ -90,33 +102,69 @@
   .btn-bounce {
     @apply active:scale-90 transition-all duration-200 ease-in-out;
   }
-  
+
   .glass-card {
-    @apply bg-white/40 dark:bg-black/20 backdrop-blur-xl border border-white/30 dark:border-white/5 shadow-xl;
+    @apply bg-white/50 dark:bg-black/20 backdrop-blur-xl border border-white/40 dark:border-white/5 shadow-xl;
   }
-  
+
   .artsy-border {
     border: 3px solid currentColor;
     box-shadow: 4px 4px 0px 0px currentColor;
   }
+
+  .ribbon {
+    position: relative;
+    padding: 0.15rem 0.9rem;
+    background: hsl(var(--primary));
+    color: white;
+    border-radius: 2rem;
+    font-weight: 900;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .sticker {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full font-black text-xs;
+    box-shadow: 2px 2px 0 0 rgba(0,0,0,0.08);
+  }
 }
 
+/* ─── Animations ─── */
 @keyframes float {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-10px) rotate(2deg); }
+  0%   { transform: translateY(0px) rotate(0deg); }
+  50%  { transform: translateY(-10px) rotate(3deg); }
   100% { transform: translateY(0px) rotate(0deg); }
 }
+.animate-float { animation: float 4s ease-in-out infinite; }
 
-.animate-float {
-  animation: float 4s ease-in-out infinite;
+@keyframes float2 {
+  0%   { transform: translateY(0px) rotate(0deg) scale(1); }
+  50%  { transform: translateY(-14px) rotate(-4deg) scale(1.05); }
+  100% { transform: translateY(0px) rotate(0deg) scale(1); }
 }
+.animate-float2 { animation: float2 5.5s ease-in-out infinite; }
 
-@keyframes cat-tail {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(15deg); }
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50%       { transform: rotate(3deg); }
 }
+.animate-wiggle { animation: wiggle 2s ease-in-out infinite; }
 
-.cat-tail {
-  transform-origin: bottom center;
-  animation: cat-tail 2s ease-in-out infinite;
+@keyframes sparkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.7); }
 }
+.animate-sparkle { animation: sparkle 2s ease-in-out infinite; }
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  25%       { transform: scale(1.15); }
+  50%       { transform: scale(1); }
+  75%       { transform: scale(1.1); }
+}
+.animate-heartbeat { animation: heartbeat 1.5s ease-in-out infinite; }
+
+/* Scrollbar hide */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
