@@ -12,6 +12,9 @@ import Tasks from "@/pages/Tasks";
 import History from "@/pages/History";
 import Tired from "@/pages/Tired";
 import Analytics from "@/pages/Analytics";
+import Todo from "@/pages/Todo";
+import Habits from "@/pages/Habits";
+import Friends from "@/pages/Friends";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,6 +29,9 @@ function Router() {
         <Route path="/history" component={History} />
         <Route path="/tired" component={Tired} />
         <Route path="/analytics" component={Analytics} />
+        <Route path="/todo" component={Todo} />
+        <Route path="/habits" component={Habits} />
+        <Route path="/friends" component={Friends} />
         <Route component={NotFound} />
       </Switch>
       <Navigation />
