@@ -1,6 +1,7 @@
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { Moon, Sun, Trophy, Flame, ChevronRight, Info, CheckSquare, Activity, BarChart3, Users, Cat, History } from "lucide-react";
+import { Moon, Sun, Trophy, Flame, ChevronRight, Info, CheckSquare, Activity, BarChart3, Users, Cat, History, Download, X } from "lucide-react";
 import { useMochi } from "@/hooks/use-mochi";
 import { KittyAvatar } from "@/components/KittyAvatar";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
@@ -42,8 +43,45 @@ export default function Dashboard() {
   const todosLeft = todos.filter(t => !t.done).length;
   const level = Math.floor(xp / 100) + 1;
 
+  // PWA install prompt
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [showInstall, setShowInstall] = useState(false);
+  useEffect(() => {
+    const handler = (e: Event) => { e.preventDefault(); setInstallPrompt(e); setShowInstall(true); };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === 'accepted') setShowInstall(false);
+  };
+
   return (
     <div className="min-h-screen pb-36 px-4 pt-6 max-w-md mx-auto">
+      {/* PWA Install Banner */}
+      {showInstall && (
+        <motion.div
+          initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-3 bg-white border-2 border-pink-200 rounded-[2rem] px-4 py-3 mb-4 shadow-md shadow-pink-100"
+        >
+          <span className="text-2xl shrink-0">📱</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-black text-zinc-700 leading-tight">Add Mochi Mode to your home screen!</p>
+            <p className="text-[10px] font-semibold text-zinc-400">Works offline, feels like a real app ✨</p>
+          </div>
+          <button onClick={handleInstall}
+            className="px-3 py-1.5 rounded-xl text-white text-xs font-black shrink-0 btn-bounce"
+            style={{ background: 'linear-gradient(135deg, #f472b6, #c084fc)' }}>
+            Install
+          </button>
+          <button onClick={() => setShowInstall(false)} className="p-1 text-zinc-300 hover:text-zinc-500 shrink-0">
+            <X size={14} />
+          </button>
+        </motion.div>
+      )}
+
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>

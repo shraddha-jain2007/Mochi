@@ -15,6 +15,7 @@ import Analytics from "@/pages/Analytics";
 import Todo from "@/pages/Todo";
 import Habits from "@/pages/Habits";
 import Friends from "@/pages/Friends";
+import Onboarding from "@/pages/Onboarding";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -32,6 +33,7 @@ function Router() {
         <Route path="/todo" component={Todo} />
         <Route path="/habits" component={Habits} />
         <Route path="/friends" component={Friends} />
+        <Route path="/onboarding" component={Onboarding} />
         <Route component={NotFound} />
       </Switch>
       <Navigation />

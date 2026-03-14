@@ -1,10 +1,18 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Square, ChevronLeft } from "lucide-react";
+import { Play, Pause, Square, ChevronLeft, Volume2, VolumeX } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import confetti from "canvas-confetti";
 import { useMochi } from "@/hooks/use-mochi";
 import { KittyAvatar } from "@/components/KittyAvatar";
+import { useAmbientSound, SoundType } from "@/hooks/useAmbientSound";
+
+const SOUNDS: { type: SoundType; emoji: string; label: string }[] = [
+  { type: 'rain',       emoji: '🌧️', label: 'Rain'    },
+  { type: 'ocean',      emoji: '🌊', label: 'Ocean'   },
+  { type: 'cafe',       emoji: '☕', label: 'Café'    },
+  { type: 'whitenoise', emoji: '📻', label: 'Focus'   },
+];
 
 const SUBJECTS = [
   { label: 'Machine Learning', emoji: '🤖', color: 'bg-violet-100 dark:bg-violet-900/30 text-violet-600' },
@@ -22,6 +30,7 @@ const SUBJECTS = [
 export default function Pomodoro() {
   const [, setLocation] = useLocation();
   const { addSession, unlockedKitties, buddyId } = useMochi();
+  const { playing: soundPlaying, soundType, toggle: toggleSound, stop: stopSound, volume, setVolume } = useAmbientSound();
   const [minutes, setMinutes]       = useState(25);
   const [timeLeft, setTimeLeft]     = useState(25 * 60);
   const [isActive, setIsActive]     = useState(false);
@@ -55,11 +64,13 @@ export default function Pomodoro() {
   };
 
   const handleSaveAndExit = () => {
+    stopSound();
     addSession({ purpose, minutes, date: new Date().toISOString(), type: 'pomodoro', subject: subject || undefined, notes: notes.trim() || undefined });
     setLocation('/dashboard');
   };
 
   const handleReset = () => {
+    stopSound();
     setIsActive(false);
     setSessionState('setup');
     setTimeLeft(minutes * 60);
@@ -180,7 +191,7 @@ export default function Pomodoro() {
               </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-4 mb-8">
               <button onClick={() => setIsActive(!isActive)}
                 className="p-5 rounded-full text-white shadow-xl btn-bounce"
                 style={{ background: 'linear-gradient(135deg, #f472b6, #c084fc)' }}>
@@ -190,6 +201,51 @@ export default function Pomodoro() {
                 className="p-5 rounded-full bg-muted text-muted-foreground shadow-md btn-bounce hover:bg-destructive/10 hover:text-destructive transition-colors">
                 <Square size={22} fill="currentColor" />
               </button>
+            </div>
+
+            {/* ── Ambient Sound Panel ── */}
+            <div className="w-full bg-white/60 backdrop-blur-sm border-2 border-pink-100 rounded-[2.5rem] p-5">
+              <div className="flex items-center gap-2 mb-4">
+                {soundPlaying ? <Volume2 size={16} className="text-pink-500" /> : <VolumeX size={16} className="text-zinc-400" />}
+                <span className="text-xs font-black uppercase tracking-widest text-zinc-500">Ambient Sound</span>
+                {soundPlaying && (
+                  <span className="ml-auto text-[10px] font-black text-pink-500 animate-pulse">
+                    ♪ playing
+                  </span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-4 gap-2 mb-4">
+                {SOUNDS.map(s => (
+                  <button
+                    key={s.type}
+                    onClick={() => toggleSound(s.type)}
+                    className={`flex flex-col items-center gap-1.5 py-3 px-1 rounded-2xl border-2 transition-all btn-bounce ${
+                      soundPlaying && soundType === s.type
+                        ? 'border-pink-400 bg-pink-50 shadow-md shadow-pink-100'
+                        : 'border-zinc-100 bg-white hover:border-pink-200'
+                    }`}
+                  >
+                    <span className="text-lg leading-none">{s.emoji}</span>
+                    <span className={`text-[10px] font-black ${soundPlaying && soundType === s.type ? 'text-pink-500' : 'text-zinc-500'}`}>
+                      {s.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              {soundPlaying && (
+                <div className="flex items-center gap-3">
+                  <VolumeX size={12} className="text-zinc-400 shrink-0" />
+                  <input
+                    type="range" min={0} max={1} step={0.05}
+                    value={volume}
+                    onChange={e => setVolume(Number(e.target.value))}
+                    className="flex-1 h-1.5 rounded-full accent-pink-500"
+                  />
+                  <Volume2 size={12} className="text-zinc-400 shrink-0" />
+                </div>
+              )}
             </div>
           </motion.div>
         )}

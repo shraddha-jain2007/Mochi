@@ -12,6 +12,9 @@ const floaties = [
 ];
 
 export default function Home() {
+  const isOnboarded = !!localStorage.getItem('mochi-onboarded');
+  const destination = isOnboarded ? '/dashboard' : '/onboarding';
+
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden">
       {/* Background */}
@@ -27,12 +30,7 @@ export default function Home() {
         <div
           key={i}
           className={`absolute z-10 ${f.size} animate-float pointer-events-none select-none`}
-          style={{
-            top: f.top,
-            left: f.left,
-            right: (f as any).right,
-            animationDelay: `${f.delay}s`,
-          }}
+          style={{ top: f.top, left: f.left, right: (f as any).right, animationDelay: `${f.delay}s` }}
         >
           {f.emoji}
         </div>
@@ -46,12 +44,9 @@ export default function Home() {
           transition={{ duration: 1.1, ease: [0.34, 1.56, 0.64, 1] }}
           className="mb-10"
         >
-          {/* Title card */}
           <div className="relative bg-white/55 dark:bg-black/25 backdrop-blur-lg p-8 rounded-[3rem] border-2 border-pink-200/60 shadow-2xl shadow-pink-200/40">
-            {/* Corner stars */}
             <div className="absolute -top-3 -left-3 text-2xl animate-sparkle">⭐</div>
             <div className="absolute -top-3 -right-3 text-2xl animate-sparkle" style={{ animationDelay: '0.7s' }}>⭐</div>
-
             <div className="text-3xl mb-2 animate-wiggle">🐾</div>
             <h1 className="text-6xl font-black text-foreground mb-1 leading-none tracking-tighter"
               style={{ fontFamily: 'Fredoka, sans-serif' }}>
@@ -66,7 +61,6 @@ export default function Home() {
               }}>
               Mode
             </h1>
-
             <p className="text-base text-foreground/70 font-semibold leading-snug">
               your cozy little world to<br/>
               <span style={{ fontFamily: 'Dancing Script, cursive', fontSize: '1.2rem', color: 'hsl(340 80% 60%)' }}>
@@ -82,7 +76,7 @@ export default function Home() {
           transition={{ delay: 0.6, duration: 0.8 }}
           className="w-full space-y-3"
         >
-          <Link href="/dashboard" className="w-full block">
+          <Link href={destination} className="w-full block">
             <button
               className="w-full py-5 rounded-[2rem] font-black text-2xl text-white transition-all duration-150 btn-bounce"
               style={{
@@ -90,7 +84,7 @@ export default function Home() {
                 boxShadow: '0 6px 0 0 #be185d, 0 10px 20px rgba(244,114,182,0.35)',
               }}
             >
-              Start my journey 🌸
+              {isOnboarded ? 'Continue 🐾' : 'Start my journey 🌸'}
             </button>
           </Link>
 
