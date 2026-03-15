@@ -140,8 +140,6 @@ export default function Tasks() {
     setCurrentTask(null);
   };
 
-  const remaining = ALL_TASKS.length - (ALL_TASKS.length - queueRef.current.length);
-
   return (
     <div className="min-h-screen pb-32 px-4 pt-8 max-w-md mx-auto flex flex-col">
       {/* Header */}

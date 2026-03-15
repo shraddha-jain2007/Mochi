@@ -47,6 +47,8 @@ interface MochiState {
   todos: TodoItem[];
   habits: Habit[];
   dailyGoalMinutes: number;
+  dreamEnergy: number;
+  dreamItemsCollected: string[];
 }
 
 const INITIAL_STATE: MochiState = {
@@ -61,6 +63,8 @@ const INITIAL_STATE: MochiState = {
   todos: [],
   habits: [],
   dailyGoalMinutes: 60,
+  dreamEnergy: 0,
+  dreamItemsCollected: [],
 };
 
 export function useMochi() {
@@ -76,6 +80,8 @@ export function useMochi() {
       if (!parsed.todos) parsed.todos = [];
       if (!parsed.habits) parsed.habits = [];
       if (!parsed.dailyGoalMinutes) parsed.dailyGoalMinutes = 60;
+      if (parsed.dreamEnergy === undefined) parsed.dreamEnergy = 0;
+      if (!parsed.dreamItemsCollected) parsed.dreamItemsCollected = [];
       setState(parsed);
     }
     setIsLoaded(true);
@@ -129,10 +135,21 @@ export function useMochi() {
     if (session.type === 'pomodoro') {
       addXP(session.minutes);
       updateStreak();
+      // Accumulate dream energy (1 per min, max 999)
+      setState(prev => ({ ...prev, dreamEnergy: Math.min(999, prev.dreamEnergy + session.minutes) }));
     } else {
       addXP(5);
     }
   };
+
+  const collectDreamItem = (item: string) =>
+    setState(prev => ({
+      ...prev,
+      dreamItemsCollected: prev.dreamItemsCollected.includes(item)
+        ? prev.dreamItemsCollected
+        : [...prev.dreamItemsCollected, item],
+      dreamEnergy: Math.max(0, prev.dreamEnergy - 10),
+    }));
 
   const setBuddy    = (id: string) => setState(prev => ({ ...prev, buddyId: id }));
   const clearHistory = ()          => setState(prev => ({ ...prev, sessions: [] }));
@@ -200,6 +217,7 @@ export function useMochi() {
     addTodo, toggleTodo, deleteTodo,
     addHabit, toggleHabit, deleteHabit,
     exportCSV, exportJSON,
+    collectDreamItem,
     isLoaded
   };
 }

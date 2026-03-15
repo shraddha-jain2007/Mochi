@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Square, ChevronLeft, Volume2, VolumeX } from "lucide-react";
+import { Play, Pause, Square, ChevronLeft, Volume2, VolumeX, Zap, Flame, Star } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import confetti from "canvas-confetti";
 import { useMochi } from "@/hooks/use-mochi";
@@ -29,7 +29,7 @@ const SUBJECTS = [
 
 export default function Pomodoro() {
   const [, setLocation] = useLocation();
-  const { addSession, unlockedKitties, buddyId } = useMochi();
+  const { addSession, unlockedKitties, buddyId, xp, streak, dreamEnergy } = useMochi();
   const { playing: soundPlaying, soundType, toggle: toggleSound, stop: stopSound, volume, setVolume } = useAmbientSound();
   const [minutes, setMinutes]       = useState(25);
   const [timeLeft, setTimeLeft]     = useState(25 * 60);
@@ -155,17 +155,32 @@ export default function Pomodoro() {
         {/* ── Running ───────────────────────────────────────── */}
         {sessionState === 'running' && (
           <motion.div key="running" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center w-full">
-            <div className="flex flex-col items-center gap-3 mb-8">
-              <KittyAvatar id={companion.id} isUnlocked size="xl" />
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-bold text-muted-foreground animate-pulse">{companion.name} is focusing with you!</p>
-              </div>
-              {subject && (
-                <span className="px-3 py-1 rounded-full text-xs font-black bg-primary/10 text-primary">
-                  {SUBJECTS.find(s => s.label === subject)?.emoji} {subject}
-                </span>
-              )}
-            </div>
+            {/* Pet mood based on progress */}
+            {(() => {
+              const moods = [
+                { min: 0,  max: 30,  msg: `${companion.name} is curling up contentedly...`,     anim: "animate-float",  glow: "#f9a8d4" },
+                { min: 30, max: 60,  msg: `${companion.name} is drifting into dreamland... 💤`, anim: "animate-float2", glow: "#c084fc" },
+                { min: 60, max: 85,  msg: `Deep in ${companion.name}'s dream world... 🌙`,      anim: "animate-float",  glow: "#818cf8" },
+                { min: 85, max: 101, msg: `${companion.name} feels the dream energy! ⚡`,       anim: "animate-wiggle", glow: "#fbbf24" },
+              ];
+              const mood = moods.find(m => progress >= m.min && progress < m.max) || moods[0];
+              return (
+                <div className="flex flex-col items-center gap-3 mb-8">
+                  <motion.div
+                    className={mood.anim}
+                    style={{ filter: `drop-shadow(0 0 16px ${mood.glow})` }}
+                  >
+                    <KittyAvatar id={companion.id} isUnlocked size="xl" />
+                  </motion.div>
+                  <p className="text-xs font-bold text-muted-foreground text-center animate-pulse px-4">{mood.msg}</p>
+                  {subject && (
+                    <span className="px-3 py-1 rounded-full text-xs font-black bg-primary/10 text-primary">
+                      {SUBJECTS.find(s => s.label === subject)?.emoji} {subject}
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Circular timer */}
             <div className="relative w-64 h-64 mb-8 flex items-center justify-center">
@@ -252,29 +267,144 @@ export default function Pomodoro() {
 
         {/* ── Completed ─────────────────────────────────────── */}
         {sessionState === 'completed' && (
-          <motion.div key="completed" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center text-center w-full">
-            <div className="text-7xl mb-4 animate-float2">🎉</div>
-            <h2 className="text-3xl font-black mb-1 text-foreground" style={{ fontFamily: 'Fredoka' }}>Session Complete!</h2>
-            <p className="text-muted-foreground font-semibold mb-2">
-              You focused for <span className="text-primary font-black">{minutes} min</span> and earned <span className="text-primary font-black">{minutes} XP</span>
-            </p>
-            {subject && <span className="px-3 py-1 rounded-full text-xs font-black bg-primary/10 text-primary mb-6">{SUBJECTS.find(s => s.label === subject)?.emoji} {subject}</span>}
+          <motion.div
+            key="completed"
+            initial={{ opacity: 0, scale: 0.85, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 220, damping: 20 }}
+            className="flex flex-col items-center text-center w-full gap-4"
+          >
+            {/* Hero reward card */}
+            <div
+              className="w-full rounded-[3rem] p-7 relative overflow-hidden"
+              style={{ background: 'linear-gradient(145deg, #1a0538, #3b0764, #581c87, #7c3aed, #c026d3)' }}
+            >
+              {/* Sparkle decorations */}
+              {['✦','✦','✦','✦','✦','✦'].map((s, i) => (
+                <div
+                  key={i}
+                  className="absolute text-white/20 animate-sparkle pointer-events-none select-none"
+                  style={{
+                    top: `${10 + (i * 15) % 80}%`,
+                    left: `${5 + (i * 17) % 90}%`,
+                    fontSize: `${8 + (i % 3) * 5}px`,
+                    animationDelay: `${i * 0.4}s`,
+                  }}
+                >
+                  {s}
+                </div>
+              ))}
+
+              {/* Kitty happy dance */}
+              <motion.div
+                className="mx-auto mb-4 animate-wiggle"
+                style={{ filter: 'drop-shadow(0 0 24px #c084fc)' }}
+              >
+                <KittyAvatar id={companion.id} isUnlocked size="xl" />
+              </motion.div>
+
+              {/* Dream bubbles above kitty */}
+              <div className="flex justify-center gap-3 mb-2 text-2xl">
+                {['⭐','💜','🌙'].map((b, i) => (
+                  <motion.span
+                    key={i}
+                    animate={{ y: [0, -8, 0] }}
+                    transition={{ duration: 1.5 + i * 0.3, repeat: Infinity, delay: i * 0.3 }}
+                  >
+                    {b}
+                  </motion.span>
+                ))}
+              </div>
+
+              <h2 className="text-3xl font-black text-white mb-1" style={{ fontFamily: 'Fredoka' }}>
+                Session Complete!
+              </h2>
+              <p className="text-white/60 text-sm font-semibold mb-5">
+                {companion.name} is so proud of you 🌸
+              </p>
+
+              {/* Reward chips */}
+              <div className="grid grid-cols-3 gap-2 mb-2">
+                {/* XP */}
+                <div className="flex flex-col items-center bg-white/10 backdrop-blur-sm rounded-2xl py-3 border border-white/10">
+                  <Star size={14} className="text-amber-300 mb-1" />
+                  <span className="text-xl font-black text-amber-300" style={{ fontFamily: 'Fredoka' }}>+{minutes}</span>
+                  <span className="text-[10px] font-bold text-white/50">XP</span>
+                </div>
+                {/* Dream Energy */}
+                <div className="flex flex-col items-center bg-white/10 backdrop-blur-sm rounded-2xl py-3 border border-white/10">
+                  <Zap size={14} className="text-violet-300 mb-1" />
+                  <span className="text-xl font-black text-violet-300" style={{ fontFamily: 'Fredoka' }}>+{minutes}</span>
+                  <span className="text-[10px] font-bold text-white/50">Dream ⚡</span>
+                </div>
+                {/* Streak */}
+                <div className="flex flex-col items-center bg-white/10 backdrop-blur-sm rounded-2xl py-3 border border-white/10">
+                  <Flame size={14} className="text-orange-300 mb-1" />
+                  <span className="text-xl font-black text-orange-300" style={{ fontFamily: 'Fredoka' }}>{streak}</span>
+                  <span className="text-[10px] font-bold text-white/50">Streak 🔥</span>
+                </div>
+              </div>
+
+              {/* Level progress */}
+              {(() => {
+                const level     = Math.floor(xp / 100) + 1;
+                const xpInLevel = xp % 100;
+                return (
+                  <div className="mt-4 bg-white/10 rounded-2xl p-3 border border-white/10">
+                    <div className="flex justify-between items-center mb-1.5">
+                      <span className="text-[11px] font-black text-white/60">Level {level}</span>
+                      <span className="text-[11px] font-bold text-white/40">{xpInLevel}/100 XP</span>
+                    </div>
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full"
+                        style={{ background: 'linear-gradient(90deg, #f472b6, #c084fc, #818cf8)' }}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${xpInLevel}%` }}
+                        transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {subject && (
+                <div className="mt-3 flex justify-center">
+                  <span className="px-3 py-1 rounded-full text-xs font-black bg-white/10 text-white/80 border border-white/20">
+                    {SUBJECTS.find(s => s.label === subject)?.emoji} {subject}
+                  </span>
+                </div>
+              )}
+            </div>
 
             {/* Session notes */}
-            <div className="w-full bg-white/60 dark:bg-white/5 border-2 border-pink-200/50 rounded-[2.5rem] p-5 mb-6 backdrop-blur-sm text-left">
-              <label className="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Session Notes (optional)</label>
+            <div className="w-full bg-white/60 dark:bg-white/5 border-2 border-pink-100 rounded-[2.5rem] p-5 backdrop-blur-sm text-left">
+              <label className="block text-xs font-black uppercase tracking-widest text-zinc-400 mb-2">
+                Session Notes (optional)
+              </label>
               <textarea
                 value={notes}
                 onChange={e => setNotes(e.target.value)}
                 placeholder="What did you learn? Any breakthroughs? 📖"
                 rows={3}
-                className="w-full text-sm font-semibold bg-transparent outline-none resize-none placeholder:text-muted-foreground/40 text-foreground"
+                className="w-full text-sm font-semibold bg-transparent outline-none resize-none placeholder:text-zinc-300 text-foreground"
               />
             </div>
 
-            <button onClick={handleSaveAndExit}
+            {/* Actions */}
+            <Link href="/dream-world" className="w-full block">
+              <button
+                className="w-full py-4 rounded-[2rem] font-black text-base btn-bounce flex items-center justify-center gap-2 border-2 border-violet-200 bg-white text-violet-600 hover:bg-violet-50 transition-colors"
+              >
+                🌙 Visit Dream World <span className="text-xs font-bold text-violet-400">(+{minutes} energy)</span>
+              </button>
+            </Link>
+
+            <button
+              onClick={handleSaveAndExit}
               className="w-full py-5 rounded-[2rem] text-white font-black text-xl btn-bounce"
-              style={{ background: 'linear-gradient(135deg, #f472b6, #c084fc)', boxShadow: '0 8px 0 0 #be185d' }}>
+              style={{ background: 'linear-gradient(135deg, #f472b6, #c084fc)', boxShadow: '0 8px 0 0 #be185d' }}
+            >
               Save & Go Home 🐾
             </button>
           </motion.div>

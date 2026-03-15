@@ -33,6 +33,7 @@ const SECONDARY_ACTIONS = [
   { href: '/friends',    icon: Users,       label: 'Friends', bg: 'bg-pink-50 dark:bg-pink-900/20',       color: 'text-pink-500',    ring: 'hover:ring-pink-200' },
   { href: '/collection', icon: Cat,         label: 'Kitties', bg: 'bg-purple-50 dark:bg-purple-900/20',   color: 'text-purple-500',  ring: 'hover:ring-purple-200' },
   { href: '/history',    icon: History,     label: 'History', bg: 'bg-rose-50 dark:bg-rose-900/20',       color: 'text-rose-400',    ring: 'hover:ring-rose-200' },
+  { href: '/dream-world',icon: Moon,        label: 'Dream 🌙',bg: 'bg-indigo-50 dark:bg-indigo-900/20',    color: 'text-indigo-500',  ring: 'hover:ring-indigo-200' },
 ];
 
 export default function Dashboard() {
