@@ -105,19 +105,13 @@ export default function Tasks() {
 
   // Shuffle queue — no repeats until all tasks shown
   const queueRef     = useRef<typeof ALL_TASKS>([]);
-  const seenCountRef = useRef(0);
-
   const [currentTask, setCurrentTask] = useState<(typeof ALL_TASKS)[0] | null>(null);
   const [isSpinning,  setIsSpinning]  = useState(false);
-  const [doneCount,   setDoneCount]   = useState(0);
-  const [skippedThisRound, setSkippedThisRound] = useState(0);
-  const [roundLabel, setRoundLabel]   = useState(1);
+  const [doneCount, setDoneCount] = useState(0);
 
   const nextFromQueue = () => {
     if (queueRef.current.length === 0) {
       queueRef.current = shuffle(ALL_TASKS);
-      setRoundLabel(r => r + 1);
-      setSkippedThisRound(0);
     }
     return queueRef.current.pop()!;
   };
@@ -127,15 +121,11 @@ export default function Tasks() {
     setCurrentTask(null);
     setTimeout(() => {
       setCurrentTask(nextFromQueue());
-      seenCountRef.current += 1;
       setIsSpinning(false);
     }, 700);
   };
 
-  const handleSkip = () => {
-    setSkippedThisRound(s => s + 1);
-    spinTask();
-  };
+  const handleSkip = () => spinTask();
 
   const handleDone = () => {
     if (!currentTask) return;
@@ -168,22 +158,6 @@ export default function Tasks() {
           <p className="text-xs font-bold text-zinc-400">
             {ALL_TASKS.length} unique tasks · no repeats
           </p>
-        </div>
-      </div>
-
-      {/* Stats bar */}
-      <div className="flex gap-2 mb-6">
-        <div className="flex-1 bg-white rounded-2xl border-2 border-pink-100 px-3 py-2 text-center shadow-sm">
-          <p className="text-xl font-black text-pink-500">{doneCount}</p>
-          <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Done</p>
-        </div>
-        <div className="flex-1 bg-white rounded-2xl border-2 border-purple-100 px-3 py-2 text-center shadow-sm">
-          <p className="text-xl font-black text-purple-500">{queueRef.current.length || ALL_TASKS.length}</p>
-          <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Remaining</p>
-        </div>
-        <div className="flex-1 bg-white rounded-2xl border-2 border-amber-100 px-3 py-2 text-center shadow-sm">
-          <p className="text-xl font-black text-amber-500">#{roundLabel}</p>
-          <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Round</p>
         </div>
       </div>
 
