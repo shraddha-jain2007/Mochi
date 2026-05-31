@@ -12,3 +12,14 @@ export const sessions = pgTable("sessions", {
 export const insertSessionSchema = createInsertSchema(sessions).omit({ id: true });
 export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type Session = typeof sessions.$inferSelect;
+
+// ── Visitor tracking (admin analytics) ──────────────────────────────────────
+export const visitors = pgTable("visitors", {
+  id: serial("id").primaryKey(),
+  visitorId: text("visitor_id").notNull().unique(),
+  firstSeen: text("first_seen").notNull(),
+  lastSeen: text("last_seen").notNull(),
+  visitCount: integer("visit_count").notNull().default(1),
+});
+
+export type Visitor = typeof visitors.$inferSelect;

@@ -13,7 +13,8 @@ export function Navigation() {
     { path: "/friends",   icon: Users,         label: "Friends", emoji: "💌" },
   ];
 
-  if (location === "/") return null;
+  const HIDE_ON = ["/", "/onboarding"];
+  if (HIDE_ON.includes(location)) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 p-3 z-50 pointer-events-none">

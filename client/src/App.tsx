@@ -1,4 +1,5 @@
 import { Switch, Route } from "wouter";
+import { useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -17,6 +18,7 @@ import Habits from "@/pages/Habits";
 import Friends from "@/pages/Friends";
 import Onboarding from "@/pages/Onboarding";
 import DreamWorld from "@/pages/DreamWorld";
+import Admin from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -36,6 +38,7 @@ function Router() {
         <Route path="/friends" component={Friends} />
         <Route path="/onboarding" component={Onboarding} />
         <Route path="/dream-world" component={DreamWorld} />
+        <Route path="/admin" component={Admin} />
         <Route component={NotFound} />
       </Switch>
       <Navigation />
@@ -43,7 +46,25 @@ function Router() {
   );
 }
 
+function useVisitorTracking() {
+  useEffect(() => {
+    try {
+      let vid = localStorage.getItem("mochi-visitor-id");
+      if (!vid) {
+        vid = `v-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+        localStorage.setItem("mochi-visitor-id", vid);
+      }
+      fetch("/api/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ visitorId: vid }),
+      }).catch(() => {});
+    } catch {}
+  }, []);
+}
+
 function App() {
+  useVisitorTracking();
   return (
     <QueryClientProvider client={queryClient}>
       <Router />
