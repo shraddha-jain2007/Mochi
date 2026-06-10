@@ -6,6 +6,21 @@ A cute self-development web app built for people who want to stay focused withou
 ## 🔗 Live Demo
 **[✨ Try Mochi Mode here!](https://mochi-mode--shru4.replit.app)**
 
+---
+
+## 🚀 How To Use
+
+1. Open Mochi Mode and start a **Pomodoro session** on Home
+2. Add your daily tasks in the **Todo** tab
+3. Log habits you want to build in the **Habits** tab
+4. After a few days, visit **Stats** to see your patterns
+5. Use Focus Heatmap to spot your consistent days
+6. Use Focus Flow to track if your trend is improving
+7. Check Peak Hour to know when you study best
+8. Use This Week chart to plan your schedule smarter
+
+---
+
 ## Features
 
  🍅 Pomodoro Timer : Timed focus sessions to keep you on track  <br>
